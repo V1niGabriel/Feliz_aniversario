@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feliz Aniversário, Bia da camisa azul! 🎉</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Pacifico&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        :root {
+            --neon-pink: #ff2a85;
+            --neon-gold: #ffd700;
+            --neon-cyan: #00f0ff;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: radial-gradient(circle at center, #1a103c 0%, #090514 100%);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            color: #ffffff;
+            user-select: none;
+        }
+
+        .font-pacifico {
+            font-family: 'Pacifico', cursive;
+        }
+
+        .font-fredoka {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        /* Texto Brilhante Animado */
+        .glow-text {
+            background: linear-gradient(90deg, #ffd700, #ff2a85, #00f0ff, #ffd700);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradient-shift 5s ease infinite;
+            filter: drop-shadow(0 0 15px rgba(255, 42, 133, 0.4));
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Animação das Chamas das Velas */
+        .flame {
+            transform-origin: bottom center;
+            animation: flicker 0.6s infinite alternate ease-in-out;
+            cursor: pointer;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .flame.out {
+            opacity: 0;
+            transform: scale(0);
+            pointer-events: none;
+        }
+
+        @keyframes flicker {
+            0% { transform: scale(1) rotate(-3deg); opacity: 0.95; }
+            50% { transform: scale(1.08, 0.95) rotate(2deg); opacity: 1; }
+            100% { transform: scale(0.95, 1.08) rotate(-1deg); opacity: 0.9; }
+        }
+
+        /* Fumaça quando a vela apaga */
+        .smoke {
+            opacity: 0;
+            stroke-dasharray: 20;
+            stroke-dashoffset: 20;
+        }
+
+        .smoke.rising {
+            animation: smoke-rise 1.8s ease-out forwards;
+        }
+
+        @keyframes smoke-rise {
+            0% { opacity: 0.8; stroke-dashoffset: 20; transform: translateY(0) scale(1); }
+            100% { opacity: 0; stroke-dashoffset: 0; transform: translateY(-25px) scale(1.4); }
+        }
+
+        /* Balões Flutuantes */
+        .balloon-wrapper {
+            position: fixed;
+            bottom: -150px;
+            z-index: 15;
+            cursor: pointer;
+            animation: float-up linear forwards;
+            transition: transform 0.15s ease-out;
+            will-change: transform, bottom;
+        }
+
+        .balloon-wrapper:hover {
+            transform: scale(1.12);
+        }
+
+        @keyframes float-up {
+            0% {
+                bottom: -150px;
+                transform: translateX(0) rotate(0deg);
+            }
+            25% {
+                transform: translateX(18px) rotate(4deg);
+            }
+            50% {
+                transform: translateX(-18px) rotate(-4deg);
+            }
+            75% {
+                transform: translateX(12px) rotate(3deg);
+            }
+            100% {
+                bottom: 115vh;
+                transform: translateX(-10px) rotate(-2deg);
+            }
+        }
+
+        /* Glassmorphism Card */
+        .festive-card {
+            background: rgba(25, 18, 56, 0.68);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 35px rgba(255, 42, 133, 0.25);
+        }
+
+        /* Botões Festivos */
+        .btn-festive {
+            background: linear-gradient(135deg, #ff2a85 0%, #ff7b00 100%);
+            box-shadow: 0 6px 20px rgba(255, 42, 133, 0.45);
+            transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .btn-festive:hover {
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 10px 25px rgba(255, 42, 133, 0.65);
+        }
+
+        .btn-festive:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        /* Pulso suave no bolo */
+        .cake-container {
+            filter: drop-shadow(0 12px 25px rgba(0,0,0,0.5));
+        }
+
+        .candle-group {
+            cursor: pointer;
+        }
+        
+        .candle-group:hover .candle-body {
+            filter: brightness(1.15);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-between relative py-6 px-4">
+
+    <!-- Canvas para Fogos de Artifício e Confetes -->
+    <canvas id="fx-canvas" class="fixed inset-0 pointer-events-none z-10"></canvas>
+
+    <!-- Container para os Balões Flutuantes -->
+    <div id="balloons-layer" class="fixed inset-0 pointer-events-none z-20 overflow-hidden"></div>
+
+    <!-- Barra Superior de Controles Rápidos -->
+    <header class="w-full max-w-4xl flex flex-wrap items-center justify-between gap-3 z-30 px-2">
+        <div class="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-full border border-white/15 text-xs sm:text-sm text-pink-200">
+            <i class="ph-fill ph-sparkle text-yellow-400 text-lg animate-spin"></i>
+            <span>Dica: Clique no céu para soltar fogos ou estoure os balões!</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <!-- Contador de Balões Estourados -->
+            <div class="bg-white/10 backdrop-blur-md px-3.5 py-2 rounded-full border border-white/15 text-xs sm:text-sm flex items-center gap-1.5 font-medium" title="Balões Estourados">
+                <span>🎈</span>
+                <span id="pop-counter" class="text-yellow-300 font-bold">0</span>
+            </div>
+
+            <!-- Botão de Música -->
+            <button id="btn-music" class="bg-white/10 hover:bg-white/20 backdrop-blur-md px-3.5 py-2 rounded-full border border-white/15 text-xs sm:text-sm flex items-center gap-1.5 transition" title="Tocar/Pausar Parabéns pra Você">
+                <i id="music-icon" class="ph-fill ph-speaker-high text-cyan-300 text-lg"></i>
+                <span id="music-label">Tocar Música 🎵</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Cartão Central Interativo -->
+    <main class="w-full max-w-2xl my-auto z-30 py-4">
+        <div class="festive-card rounded-3xl p-6 sm:p-10 text-center relative overflow-hidden">
+            
+            <!-- Brilho Decorativo de Fundo -->
+            <div class="absolute -top-24 -left-24 w-48 h-48 bg-blue-500/25 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-pink-500/25 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Badge de Celebração -->
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-sky-500/20 border border-sky-400/40 text-sky-300 text-xs font-semibold uppercase tracking-wider mb-3">
+                <span>👕</span> Dia Especial • Fitness & Energia <span>💪🏃‍♀️</span>
+            </div>
+
+            <!-- Título Principal -->
+            <h1 class="font-pacifico text-4xl sm:text-5xl glow-text py-2 mb-1">
+                Feliz Aniversário, Bia da camisa azul! 🎉
+            </h1>
+
+            <!-- Ícones Temáticos (Academia, Crossfit, Corrida) -->
+            <div class="flex items-center justify-center gap-3 my-3 text-xs sm:text-sm font-medium text-sky-200/90">
+                <span class="bg-blue-500/20 border border-blue-400/30 px-3 py-1 rounded-full flex items-center gap-1.5">
+                    <i class="ph-fill ph-barbell text-sky-400"></i> Academia & Crossfit
+                </span>
+                <span class="bg-pink-500/20 border border-pink-400/30 px-3 py-1 rounded-full flex items-center gap-1.5">
+                    <i class="ph-fill ph-sneaker-move text-pink-400"></i> Corrida & Saúde
+                </span>
+            </div>
+
+            <!-- Mensagem Carinhosa -->
+            <p id="honoree-message" class="text-pink-100/95 text-sm sm:text-base max-w-lg mx-auto leading-relaxed mb-6 font-normal">
+                Que o seu novo ciclo seja repleto de alegria, saúde, academia, crossfit, corrida, conquistas brilhantes e momentos inesquecíveis. Faça um pedido especial e sopre as velinhas abaixo.
+            </p>
+
+            <!-- Mensagem Surpresa (Aparece ao apagar todas as velas) -->
+            <div id="wish-banner" class="hidden transform transition-all duration-500 scale-95 opacity-0 mb-6 bg-gradient-to-r from-sky-500/25 via-pink-500/25 to-yellow-500/25 border border-sky-400/40 rounded-2xl p-4 shadow-lg">
+                <p class="font-fredoka text-lg sm:text-xl text-yellow-300 font-bold flex items-center justify-center gap-2">
+                    <span>🎉</span> Viva, Bia! Pedido enviado para o universo! <span>🥳</span>
+                </p>
+                <p class="text-xs sm:text-sm text-white/90 mt-1">
+                    Que não faltem PRs no Crossfit, muitos quilômetros de corrida e felicidades sem fim! 💙💪
+                </p>
+            </div>
+
+            <!-- Bolo de Aniversário Interativo em SVG -->
+            <div class="cake-container relative mx-auto w-64 sm:w-80 h-60 sm:h-68 flex items-center justify-center my-2">
+                <svg viewBox="0 0 300 260" class="w-full h-full overflow-visible">
+                    <defs>
+                        <!-- Gradiente da Chama -->
+                        <radialGradient id="flameGrad" cx="50%" cy="65%" r="50%">
+                            <stop offset="0%" stop-color="#ffffff" />
+                            <stop offset="40%" stop-color="#ffee00" />
+                            <stop offset="80%" stop-color="#ff6600" />
+                            <stop offset="100%" stop-color="#ff0000" stop-opacity="0" />
+                        </radialGradient>
+                        <!-- Brilho da Chama -->
+                        <filter id="glow" x="-40%" y="-40%" width="180%" height="180%">
+                            <feGaussianBlur stdDeviation="4" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                        </filter>
+                        <!-- Gradientes do Bolo -->
+                        <linearGradient id="cakeTopTier" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stop-color="#fbcfe8" />
+                            <stop offset="50%" stop-color="#f9a8d4" />
+                            <stop offset="100%" stop-color="#f472b6" />
+                        </linearGradient>
+                        <linearGradient id="cakeBottomTier" x1="0" y1="0" x2="1" y2="0">
+                            <stop offset="0%" stop-color="#c084fc" />
+                            <stop offset="50%" stop-color="#a855f7" />
+                            <stop offset="100%" stop-color="#9333ea" />
+                        </linearGradient>
+                        <linearGradient id="icingGrad" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stop-color="#ffffff" />
+                            <stop offset="100%" stop-color="#ffe4e6" />
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Prato / Suporte do Bolo -->
+                    <ellipse cx="150" cy="240" rx="125" ry="12" fill="#e2e8f0" />
+                    <ellipse cx="150" cy="237" rx="115" ry="9" fill="#cbd5e1" />
+
+                    <!-- Camada Inferior do Bolo -->
+                    <rect x="45" y="160" width="210" height="77" rx="14" fill="url(#cakeBottomTier)" />
+                    <!-- Detalhe de Recheio Camada Inferior -->
+                    <line x1="45" y1="200" x2="255" y2="200" stroke="#fde047" stroke-width="5" stroke-dasharray="12 6" opacity="0.8" />
+                    
+                    <!-- Cobertura Escorrendo Camada Inferior -->
+                    <path d="M 45 168 Q 45 156 58 156 L 242 156 Q 255 156 255 168 
+                             Q 245 186 235 172 Q 225 158 215 178 Q 205 194 192 172 
+                             Q 180 158 168 180 Q 155 195 142 172 Q 130 158 118 182 
+                             Q 105 195 92 172 Q 80 158 68 178 Q 55 190 45 168 Z" 
+                          fill="url(#icingGrad)" />
+
+                    <!-- Camada Superior do Bolo -->
+                    <rect x="75" y="100" width="150" height="62" rx="12" fill="url(#cakeTopTier)" />
+                    
+                    <!-- Cobertura Escorrendo Camada Superior -->
+                    <path d="M 75 108 Q 75 98 86 98 L 214 98 Q 225 98 225 108 
+                             Q 216 125 206 112 Q 196 100 186 118 Q 175 132 162 112 
+                             Q 150 98 138 120 Q 126 132 114 112 Q 102 100 92 118 
+                             Q 82 128 75 108 Z" 
+                          fill="url(#icingGrad)" />
+
+                    <!-- Confeitos Coloridos e Morangos no Topo -->
+                    <circle cx="95" cy="97" r="6" fill="#ef4444" />
+                    <circle cx="125" cy="96" r="6" fill="#ef4444" />
+                    <circle cx="150" cy="96" r="6" fill="#ef4444" />
+                    <circle cx="175" cy="96" r="6" fill="#ef4444" />
+                    <circle cx="205" cy="97" r="6" fill="#ef4444" />
+
+                    <!-- Granulados -->
+                    <rect x="90" y="135" width="8" height="4" rx="2" fill="#fde047" transform="rotate(20 90 135)" />
+                    <rect x="135" y="142" width="8" height="4" rx="2" fill="#38bdf8" transform="rotate(-15 135 142)" />
+                    <rect x="175" y="132" width="8" height="4" rx="2" fill="#4ade80" transform="rotate(30 175 132)" />
+                    <rect x="200" y="145" width="8" height="4" rx="2" fill="#fde047" transform="rotate(-25 200 145)" />
+                    <rect x="70" y="215" width="9" height="4" rx="2" fill="#f472b6" transform="rotate(-15 70 215)" />
+                    <rect x="120" y="220" width="9" height="4" rx="2" fill="#38bdf8" transform="rotate(25 120 220)" />
+                    <rect x="180" y="218" width="9" height="4" rx="2" fill="#4ade80" transform="rotate(-10 180 218)" />
+                    <rect x="225" y="212" width="9" height="4" rx="2" fill="#fde047" transform="rotate(18 225 212)" />
+
+                    <!-- VELAS INTERATIVAS (5 Velas) -->
+                    <!-- Vela 1 -->
+                    <g class="candle-group" data-index="0" onclick="extinguishCandle(0)">
+                        <rect class="candle-body" x="89" y="54" width="12" height="44" rx="3" fill="#38bdf8" />
+                        <path d="M89 65 L101 72 M89 80 L101 87" stroke="#ffffff" stroke-width="3" opacity="0.7" />
+                        <line x1="95" y1="54" x2="95" y2="48" stroke="#334155" stroke-width="2" />
+                        <path id="smoke-0" class="smoke" d="M95 45 Q 90 35 98 25 T 93 5" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" />
+                        <g id="flame-0" class="flame" filter="url(#glow)" style="transform-origin: 95px 48px;">
+                            <path d="M95 22 C95 22 85 36 88 44 C90 49 100 49 102 44 C105 36 95 22 95 22 Z" fill="url(#flameGrad)" />
+                            <circle cx="95" cy="43" r="3" fill="#ffffff" />
+                        </g>
+                    </g>
+
+                    <!-- Vela 2 -->
+                    <g class="candle-group" data-index="1" onclick="extinguishCandle(1)">
+                        <rect class="candle-body" x="116" y="48" width="12" height="50" rx="3" fill="#facc15" />
+                        <path d="M116 60 L128 67 M116 75 L128 82" stroke="#ffffff" stroke-width="3" opacity="0.7" />
+                        <line x1="122" y1="48" x2="122" y2="42" stroke="#334155" stroke-width="2" />
+                        <path id="smoke-1" class="smoke" d="M122 39 Q 117 29 125 19 T 120 0" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" />
+                        <g id="flame-1" class="flame" filter="url(#glow)" style="transform-origin: 122px 42px; animation-delay: 0.15s;">
+                            <path d="M122 16 C122 16 112 30 115 38 C117 43 127 43 129 38 C132 30 122 16 122 16 Z" fill="url(#flameGrad)" />
+                            <circle cx="122" cy="37" r="3" fill="#ffffff" />
+                        </g>
+                    </g>
+
+                    <!-- Vela 3 (Central) -->
+                    <g class="candle-group" data-index="2" onclick="extinguishCandle(2)">
+                        <rect class="candle-body" x="144" y="44" width="12" height="54" rx="3" fill="#ff2a85" />
+                        <path d="M144 56 L156 63 M144 71 L156 78 M144 86 L156 93" stroke="#ffffff" stroke-width="3" opacity="0.7" />
+                        <line x1="150" y1="44" x2="150" y2="38" stroke="#334155" stroke-width="2" />
+                        <path id="smoke-2" class="smoke" d="M150 35 Q 145 25 153 15 T 148 -5" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" />
+                        <g id="flame-2" class="flame" filter="url(#glow)" style="transform-origin: 150px 38px; animation-delay: 0.3s;">
+                            <path d="M150 12 C150 12 140 26 143 34 C145 39 155 39 157 34 C160 26 150 12 150 12 Z" fill="url(#flameGrad)" />
+                            <circle cx="150" cy="33" r="3" fill="#ffffff" />
+                        </g>
+                    </g>
+
+                    <!-- Vela 4 -->
+                    <g class="candle-group" data-index="3" onclick="extinguishCandle(3)">
+                        <rect class="candle-body" x="172" y="48" width="12" height="50" rx="3" fill="#4ade80" />
+                        <path d="M172 60 L184 67 M172 75 L184 82" stroke="#ffffff" stroke-width="3" opacity="0.7" />
+                        <line x1="178" y1="48" x2="178" y2="42" stroke="#334155" stroke-width="2" />
+                        <path id="smoke-3" class="smoke" d="M178 39 Q 173 29 181 19 T 176 0" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" />
+                        <g id="flame-3" class="flame" filter="url(#glow)" style="transform-origin: 178px 42px; animation-delay: 0.2s;">
+                            <path d="M178 16 C178 16 168 30 171 38 C173 43 183 43 185 38 C188 30 178 16 178 16 Z" fill="url(#flameGrad)" />
+                            <circle cx="178" cy="37" r="3" fill="#ffffff" />
+                        </g>
+                    </g>
+
+                    <!-- Vela 5 -->
+                    <g class="candle-group" data-index="4" onclick="extinguishCandle(4)">
+                        <rect class="candle-body" x="199" y="54" width="12" height="44" rx="3" fill="#a855f7" />
+                        <path d="M199 65 L211 72 M199 80 L211 87" stroke="#ffffff" stroke-width="3" opacity="0.7" />
+                        <line x1="205" y1="54" x2="205" y2="48" stroke="#334155" stroke-width="2" />
+                        <path id="smoke-4" class="smoke" d="M205 45 Q 200 35 208 25 T 203 5" fill="none" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round" />
+                        <g id="flame-4" class="flame" filter="url(#glow)" style="transform-origin: 205px 48px; animation-delay: 0.4s;">
+                            <path d="M205 22 C205 22 195 36 198 44 C200 49 210 49 212 44 C215 36 205 22 205 22 Z" fill="url(#flameGrad)" />
+                            <circle cx="205" cy="43" r="3" fill="#ffffff" />
+                        </g>
+                    </g>
+                </svg>
+            </div>
+
+            <p id="candle-status" class="text-xs text-pink-200/75 mb-5">
+                Clique diretamente nas chamas das velas ou no botão abaixo para apagá-las!
+            </p>
+
+            <!-- Botões de Ação Principal -->
+            <div class="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
+                <button id="btn-blow" onclick="blowAllCandles()" class="btn-festive text-white font-fredoka font-semibold text-base sm:text-lg px-7 py-3.5 rounded-full flex items-center gap-2">
+                    <i class="ph-fill ph-wind text-xl"></i>
+                    <span id="btn-blow-text">Soprar as Velas! 💨</span>
+                </button>
+
+                <button id="btn-relight" onclick="relightCandles()" class="hidden bg-white/15 hover:bg-white/25 text-white font-fredoka font-medium text-base px-6 py-3.5 rounded-full border border-white/20 transition flex items-center gap-2">
+                    <i class="ph-fill ph-flame text-orange-400 text-xl"></i>
+                    <span>Acender Velas 🔥</span>
+                </button>
+
+                <button onclick="triggerMegaFireworks()" class="bg-blue-600/40 hover:bg-blue-600/60 text-blue-100 font-fredoka font-medium text-base px-5 py-3.5 rounded-full border border-blue-400/30 transition flex items-center gap-2">
+                    <i class="ph-fill ph-shooting-star text-yellow-300 text-xl"></i>
+                    <span>Soltar Fogos! 🎆</span>
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="z-30 text-center text-xs text-white/50 py-2">
+        Feito especialmente para Bia da camisa azul 💙 • Clique em qualquer lugar da tela para soltar fogos!
+    </footer>
+
+    <!-- Script Principal -->
+    <script>
+        /* ==========================================================================
+           1. GERADOR DE ÁUDIO (WEB AUDIO API) - Melodia e Efeitos Sonoros
+           ========================================================================== */
+        let audioCtx = null;
+        let isPlayingMusic = false;
+        let musicTimeoutIds = [];
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        // Efeito sonoro de estourar balão
+        function playPopSound() {
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(380, now);
+                osc.frequency.exponentialRampToValueAtTime(60, now + 0.09);
+
+                gain.gain.setValueAtTime(0.35, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.09);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.09);
+            } catch (e) {
+                // Ignora caso áudio esteja bloqueado
+            }
+        }
+
+        // Efeito sonoro de soprar vela
+        function playBlowSound() {
+            try {
+                initAudio();
+                const bufferSize = audioCtx.sampleRate * 0.28;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = Math.random() * 2 - 1;
+                }
+
+                const noise = audioCtx.createBufferSource();
+                noise.buffer = buffer;
+
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'bandpass';
+                filter.frequency.setValueAtTime(700, audioCtx.currentTime);
+                filter.Q.setValueAtTime(1.5, audioCtx.currentTime);
+
+                const gain = audioCtx.createGain();
+                gain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.28);
+
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                noise.start();
+            } catch (e) {}
+        }
+
+        // Efeito sonoro suave de explosão de fogos
+        function playFireworkSound() {
+            try {
+                if (!audioCtx || audioCtx.state !== 'running') return;
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(160 + Math.random() * 80, now);
+                osc.frequency.exponentialRampToValueAtTime(35, now + 0.18);
+
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start(now);
+                osc.stop(now + 0.18);
+            } catch (e) {}
+        }
+
+        // Melodia "Parabéns pra Você"
+        const NOTES = {
+            C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23,
+            G4: 392.00, A4: 440.00, Bb4: 466.16, C5: 523.25
+        };
+
+        const HAPPY_BIRTHDAY_SONG = [
+            { note: 'C4', dur: 0.32 }, { note: 'C4', dur: 0.22 },
+            { note: 'D4', dur: 0.50 }, { note: 'C4', dur: 0.50 },
+            { note: 'F4', dur: 0.50 }, { note: 'E4', dur: 0.95 },
+
+            { note: 'C4', dur: 0.32 }, { note: 'C4', dur: 0.22 },
+            { note: 'D4', dur: 0.50 }, { note: 'C4', dur: 0.50 },
+            { note: 'G4', dur: 0.50 }, { note: 'F4', dur: 0.95 },
+
+            { note: 'C4', dur: 0.32 }, { note: 'C4', dur: 0.22 },
+            { note: 'C5', dur: 0.50 }, { note: 'A4', dur: 0.50 },
+            { note: 'F4', dur: 0.50 }, { note: 'E4', dur: 0.50 },
+            { note: 'D4', dur: 0.95 },
+
+            { note: 'Bb4', dur: 0.32 }, { note: 'Bb4', dur: 0.22 },
+            { note: 'A4', dur: 0.50 }, { note: 'F4', dur: 0.50 },
+            { note: 'G4', dur: 0.50 }, { note: 'F4', dur: 1.10 }
+        ];
+
+        function playNote(freq, startTime, duration) {
+            const osc = audioCtx.createOscillator();
+            const subOsc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'triangle';
+            subOsc.type = 'sine';
+
+            osc.frequency.setValueAtTime(freq, startTime);
+            subOsc.frequency.setValueAtTime(freq * 2, startTime); // Harmônico brilhante (caixinha de música)
+
+            gain.gain.setValueAtTime(0.001, startTime);
+            gain.gain.linearRampToValueAtTime(0.2, startTime + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+
+            osc.connect(gain);
+            subOsc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start(startTime);
+            subOsc.start(startTime);
+            osc.stop(startTime + duration);
+            subOsc.stop(startTime + duration);
+        }
+
+        function startBirthdayMelody() {
+            initAudio();
+            stopBirthdayMelody();
+            isPlayingMusic = true;
+            updateMusicUI();
+
+            let currentTime = audioCtx.currentTime + 0.1;
+            let totalDuration = 0;
+
+            HAPPY_BIRTHDAY_SONG.forEach((item) => {
+                playNote(NOTES[item.note], currentTime, item.dur);
+                currentTime += item.dur + 0.04;
+                totalDuration += (item.dur + 0.04) * 1000;
+            });
+
+            const loopId = setTimeout(() => {
+                if (isPlayingMusic) {
+                    startBirthdayMelody();
+                }
+            }, totalDuration + 400);
+            musicTimeoutIds.push(loopId);
+        }
+
+        function stopBirthdayMelody() {
+            isPlayingMusic = false;
+            musicTimeoutIds.forEach(id => clearTimeout(id));
+            musicTimeoutIds = [];
+            updateMusicUI();
+        }
+
+        function updateMusicUI() {
+            const icon = document.getElementById('music-icon');
+            const label = document.getElementById('music-label');
+            if (isPlayingMusic) {
+                icon.className = 'ph-fill ph-music-notes text-pink-400 text-lg animate-bounce';
+                label.textContent = 'Pausar Música 🎵';
+            } else {
+                icon.className = 'ph-fill ph-speaker-high text-cyan-300 text-lg';
+                label.textContent = 'Tocar Música 🎵';
+            }
+        }
+
+        document.getElementById('btn-music').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (isPlayingMusic) {
+                stopBirthdayMelody();
+            } else {
+                startBirthdayMelody();
+            }
+        });
+
+        /* ==========================================================================
+           2. LÓGICA DO BOLO E VELAS INTERATIVAS
+           ========================================================================== */
+        const candleStates = [true, true, true, true, true];
+
+        function extinguishCandle(index) {
+            if (!candleStates[index]) return;
+            candleStates[index] = false;
+            playBlowSound();
+
+            const flame = document.getElementById(`flame-${index}`);
+            const smoke = document.getElementById(`smoke-${index}`);
+
+            if (flame) flame.classList.add('out');
+            if (smoke) {
+                smoke.classList.remove('rising');
+                void smoke.offsetWidth; // Reflow para reiniciar animação
+                smoke.classList.add('rising');
+            }
+
+            checkAllCandlesOut();
+        }
+
+        function blowAllCandles() {
+            initAudio();
+            let delay = 0;
+            candleStates.forEach((isLit, idx) => {
+                if (isLit) {
+                    setTimeout(() => extinguishCandle(idx), delay);
+                    delay += 110;
+                }
+            });
+        }
+
+        function checkAllCandlesOut() {
+            const allOut = candleStates.every(state => state === false);
+            if (allOut) {
+                // Exibe mensagem especial
+                const banner = document.getElementById('wish-banner');
+                banner.classList.remove('hidden');
+                setTimeout(() => {
+                    banner.classList.remove('scale-95', 'opacity-0');
+                    banner.classList.add('scale-100', 'opacity-100');
+                }, 30);
+
+                // Atualiza botões
+                document.getElementById('btn-blow').classList.add('hidden');
+                document.getElementById('btn-relight').classList.remove('hidden');
+                document.getElementById('candle-status').textContent = '✨ Todas as velinhas foram apagadas! Feliz Aniversário! ✨';
+
+                // Toca Parabéns pra Você e dispara salva de fogos e confetes
+                if (!isPlayingMusic) {
+                    startBirthdayMelody();
+                }
+                triggerMegaFireworks();
+                burstConfetti(120);
+            }
+        }
+
+        function relightCandles() {
+            candleStates.fill(true);
+            for (let i = 0; i < 5; i++) {
+                const flame = document.getElementById(`flame-${i}`);
+                const smoke = document.getElementById(`smoke-${i}`);
+                if (flame) flame.classList.remove('out');
+                if (smoke) smoke.classList.remove('rising');
+            }
+
+            const banner = document.getElementById('wish-banner');
+            banner.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => banner.classList.add('hidden'), 300);
+
+            document.getElementById('btn-blow').classList.remove('hidden');
+            document.getElementById('btn-relight').classList.add('hidden');
+            document.getElementById('candle-status').textContent = 'Clique diretamente nas chamas das velas ou no botão abaixo para apagá-las!';
+        }
+
+        /* ==========================================================================
+           3. BALÕES FLUTUANTES QUE ESTOURAM COM UM CLIQUE
+           ========================================================================== */
+        const balloonsLayer = document.getElementById('balloons-layer');
+        const popCounterEl = document.getElementById('pop-counter');
+        let poppedCount = 0;
+
+        // Cores com destaque especial para tons de azul ("camisa azul") e cores festivas
+        const BALLOON_COLORS = [
+            '#0ea5e9', '#38bdf8', '#2563eb', '#ff2a85', '#00f0ff', '#ffd700', '#a855f7', '#4ade80'
+        ];
+        const BALLOON_EMOJIS = ['💙', '👕', '💪', '🏃‍♀️', '🏋️‍♀️', '🎉', '✨', '🎂'];
+
+        function spawnBalloon() {
+            if (document.hidden) return;
+            // Limita número máximo de balões simultâneos na tela
+            if (balloonsLayer.children.length > 10) return;
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'balloon-wrapper pointer-events-auto';
+
+            const size = 58 + Math.random() * 24;
+            const color = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)];
+            const badgeEmoji = BALLOON_EMOJIS[Math.floor(Math.random() * BALLOON_EMOJIS.length)];
+            const leftPos = 5 + Math.random() * 88;
+            const duration = 9 + Math.random() * 6;
+
+            wrapper.style.left = `${leftPos}vw`;
+            wrapper.style.animationDuration = `${duration}s`;
+
+            wrapper.innerHTML = `
+                <svg width="${size}" height="${size * 1.45}" viewBox="0 0 60 90" class="overflow-visible drop-shadow-lg">
+                    <path d="M30 66 Q 26 76 32 86" stroke="rgba(255,255,255,0.55)" stroke-width="1.5" fill="none" />
+                    <ellipse cx="30" cy="32" rx="25" ry="30" fill="${color}" fill-opacity="0.9" />
+                    <ellipse cx="20" cy="20" rx="6" ry="10" fill="white" fill-opacity="0.35" transform="rotate(-20 20 20)" />
+                    <polygon points="27,61 33,61 35,66 25,66" fill="${color}" />
+                    <text x="30" y="38" text-anchor="middle" font-size="16" fill="#ffffff" style="pointer-events:none;">${badgeEmoji}</text>
+                </svg>
+            `;
+
+            wrapper.addEventListener('pointerdown', (e) => {
+                e.stopPropagation();
+                const rect = wrapper.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                playPopSound();
+                createBalloonPopParticles(centerX, centerY, color);
+                poppedCount++;
+                popCounterEl.textContent = poppedCount;
+                wrapper.remove();
+            });
+
+            wrapper.addEventListener('animationend', () => {
+                wrapper.remove();
+            });
+
+            balloonsLayer.appendChild(wrapper);
+        }
+
+        setInterval(spawnBalloon, 1800);
+        // Cria alguns balões iniciais
+        for (let i = 0; i < 4; i++) {
+            setTimeout(spawnBalloon, i * 400);
+        }
+
+        /* ==========================================================================
+           4. CANVAS DE FOGOS DE ARTIFÍCIO INTERATIVOS & CHUVA DE CONFETES
+           ========================================================================== */
+        const canvas = document.getElementById('fx-canvas');
+        const ctx = canvas.getContext('2d');
+        let cw = window.innerWidth;
+        let ch = window.innerHeight;
+
+        function resizeCanvas() {
+            cw = window.innerWidth;
+            ch = window.innerHeight;
+            canvas.width = cw;
+            canvas.height = ch;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const fireworks = [];
+        const particles = [];
+        const confettiList = [];
+
+        const FESTIVE_HUES = [330, 45, 190, 280, 130, 15];
+
+        // Inicializa chuva contínua de confetes
+        function createConfettiPiece(yPos = -20) {
+            return {
+                x: Math.random() * cw,
+                y: yPos,
+                w: 6 + Math.random() * 6,
+                h: 10 + Math.random() * 8,
+                color: BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)],
+                vy: 1.2 + Math.random() * 2.2,
+                vx: (Math.random() - 0.5) * 1.5,
+                angle: Math.random() * 360,
+                spin: (Math.random() - 0.5) * 8,
+                wobble: Math.random() * 10
+            };
+        }
+
+        for (let i = 0; i < 55; i++) {
+            confettiList.push(createConfettiPiece(Math.random() * ch));
+        }
+
+        function burstConfetti(amount = 80) {
+            for (let i = 0; i < amount; i++) {
+                confettiList.push(createConfettiPiece(-10 - Math.random() * 150));
+            }
+        }
+
+        // Foguete subindo até o ponto de explosão
+        class FireworkRocket {
+            constructor(sx, sy, tx, ty) {
+                this.x = sx;
+                this.y = sy;
+                this.sx = sx;
+                this.sy = sy;
+                this.tx = tx;
+                this.ty = ty;
+                this.hue = FESTIVE_HUES[Math.floor(Math.random() * FESTIVE_HUES.length)] + (Math.random() * 20 - 10);
+
+                const angle = Math.atan2(ty - sy, tx - sx);
+                const speed = 11 + Math.random() * 4;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.trail = [];
+            }
+
+            update() {
+                this.trail.push({ x: this.x, y: this.y });
+                if (this.trail.length > 6) this.trail.shift();
+
+                this.x += this.vx;
+                this.y += this.vy;
+
+                const dist = Math.hypot(this.tx - this.x, this.ty - this.y);
+                if (dist < 16 || this.y <= this.ty) {
+                    explodeFirework(this.tx, this.ty, this.hue);
+                    return true; // Remove foguete
+                }
+                return false;
+            }
+
+            draw() {
+                ctx.beginPath();
+                if (this.trail.length > 0) {
+                    ctx.moveTo(this.trail[0].x, this.trail[0].y);
+                    ctx.lineTo(this.x, this.y);
+                }
+                ctx.strokeStyle = `hsla(${this.hue}, 100%, 70%, 0.8)`;
+                ctx.lineWidth = 2.5;
+                ctx.stroke();
+            }
+        }
+
+        // Partículas da Explosão
+        class SparkParticle {
+            constructor(x, y, hue, customColor = null) {
+                this.x = x;
+                this.y = y;
+                const angle = Math.random() * Math.PI * 2;
+                const speed = 1.5 + Math.random() * 7.5;
+                this.vx = Math.cos(angle) * speed;
+                this.vy = Math.sin(angle) * speed;
+                this.gravity = 0.09;
+                this.friction = 0.96;
+                this.alpha = 1;
+                this.decay = 0.012 + Math.random() * 0.015;
+                this.hue = hue + (Math.random() * 30 - 15);
+                this.customColor = customColor;
+                this.size = 2 + Math.random() * 2.2;
+            }
+
+            update() {
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+                return this.alpha <= 0;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, this.alpha);
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.customColor || `hsl(${this.hue}, 100%, 65%)`;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = this.customColor || `hsl(${this.hue}, 100%, 60%)`;
+                ctx.fill();
+                ctx.restore();
+            }
+        }
+
+        function explodeFirework(x, y, hue) {
+            playFireworkSound();
+            const count = 55 + Math.floor(Math.random() * 35);
+            for (let i = 0; i < count; i++) {
+                particles.push(new SparkParticle(x, y, hue));
+            }
+        }
+
+        function createBalloonPopParticles(x, y, color) {
+            for (let i = 0; i < 28; i++) {
+                particles.push(new SparkParticle(x, y, 0, color));
+            }
+        }
+
+        function launchRandomFirework() {
+            const sx = cw * 0.2 + Math.random() * (cw * 0.6);
+            const sy = ch;
+            const tx = cw * 0.1 + Math.random() * (cw * 0.8);
+            const ty = ch * 0.1 + Math.random() * (ch * 0.45);
+            fireworks.push(new FireworkRocket(sx, sy, tx, ty));
+        }
+
+        function triggerMegaFireworks() {
+            for (let i = 0; i < 8; i++) {
+                setTimeout(() => {
+                    launchRandomFirework();
+                }, i * 180);
+            }
+        }
+
+        // Clique em qualquer lugar da tela dispara fogos naquela posição
+        window.addEventListener('pointerdown', (e) => {
+            // Evita soltar fogos se clicou dentro de um botão ou vela
+            if (e.target.closest('button, .candle-group')) return;
+            const sx = cw / 2 + (Math.random() - 0.5) * 200;
+            fireworks.push(new FireworkRocket(sx, ch, e.clientX, e.clientY));
+        });
+
+        // Loop Principal de Animação (Fogos + Confetes)
+        let lastAutoFirework = 0;
+        function animateCanvas(timestamp) {
+            ctx.clearRect(0, 0, cw, ch);
+
+            // Dispara fogos automáticos continuamente
+            if (timestamp - lastAutoFirework > 1100) {
+                launchRandomFirework();
+                lastAutoFirework = timestamp;
+            }
+
+            // Atualiza e desenha Confetes
+            for (let i = confettiList.length - 1; i >= 0; i--) {
+                const c = confettiList[i];
+                c.y += c.vy;
+                c.wobble += 0.05;
+                c.x += Math.sin(c.wobble) * 1.1 + c.vx;
+                c.angle += c.spin;
+
+                ctx.save();
+                ctx.translate(c.x, c.y);
+                ctx.rotate((c.angle * Math.PI) / 180);
+                ctx.fillStyle = c.color;
+                ctx.globalAlpha = 0.85;
+                ctx.fillRect(-c.w / 2, -c.h / 2, c.w, c.h);
+                ctx.restore();
+
+                if (c.y > ch + 20) {
+                    if (confettiList.length > 55) {
+                        confettiList.splice(i, 1);
+                    } else {
+                        c.y = -20;
+                        c.x = Math.random() * cw;
+                    }
+                }
+            }
+
+            // Atualiza e desenha Foguetes
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                fireworks[i].draw();
+                if (fireworks[i].update()) {
+                    fireworks.splice(i, 1);
+                }
+            }
+
+            // Atualiza e desenha Partículas de Explosão
+            for (let i = particles.length - 1; i >= 0; i--) {
+                particles[i].draw();
+                if (particles[i].update()) {
+                    particles.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(animateCanvas);
+        }
+
+        window.onload = function () {
+            requestAnimationFrame(animateCanvas);
+            // Salva inicial de boas-vindas
+            setTimeout(launchRandomFirework, 300);
+            setTimeout(launchRandomFirework, 600);
+        };
+    </script>
+</body>
+</html>
